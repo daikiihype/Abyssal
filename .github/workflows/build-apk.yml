@@ -1,0 +1,66 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Testes de simulacao (sem dependencias)
+        run: node --test tests/sim.test.mjs
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Gerar APK de teste (assinado com a chave debug)
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Gerar APK de release (somente se houver chave configurada)
+        working-directory: android
+        env:
+          KS_B64: ${{ secrets.ABYSSAL_KEYSTORE_BASE64 }}
+          ABYSSAL_KEYSTORE_PASSWORD: ${{ secrets.ABYSSAL_KEYSTORE_PASSWORD }}
+          ABYSSAL_KEY_ALIAS: ${{ secrets.ABYSSAL_KEY_ALIAS }}
+          ABYSSAL_KEY_PASSWORD: ${{ secrets.ABYSSAL_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/abyssal.jks"
+            export ABYSSAL_KEYSTORE="$RUNNER_TEMP/abyssal.jks"
+            chmod +x gradlew
+            ./gradlew assembleRelease --no-daemon --stacktrace
+          else
+            echo "Sem chave de release configurada: pulando (use o APK debug)."
+          fi
+
+      - name: Reunir APKs
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/ABYSSAL-Android-debug.apk
+          if [ -f android/app/build/outputs/apk/release/app-release.apk ]; then
+            cp android/app/build/outputs/apk/release/app-release.apk dist/ABYSSAL-Android.apk
+          fi
+          ls -la dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ABYSSAL-APK
+          path: dist/*.apk
