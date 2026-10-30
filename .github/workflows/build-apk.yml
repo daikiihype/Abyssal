@@ -36,11 +36,18 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      - name: Preparar Gradle Wrapper
+        working-directory: android
+        run: |
+          sed -i 's/\r$//' gradlew
+          chmod +x gradlew
+          test -f gradle/wrapper/gradle-wrapper.jar
+          test -f gradle/wrapper/gradle-wrapper.properties
+
       - name: Gerar APK de teste (assinado com a chave debug)
         working-directory: android
         run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          bash ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Gerar APK de release (somente se houver chave configurada)
         working-directory: android
@@ -53,8 +60,7 @@ jobs:
           if [ -n "$KS_B64" ]; then
             echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/abyssal.jks"
             export ABYSSAL_KEYSTORE="$RUNNER_TEMP/abyssal.jks"
-            chmod +x gradlew
-            ./gradlew assembleRelease --no-daemon --stacktrace
+            bash ./gradlew assembleRelease --no-daemon --stacktrace
           else
             echo "Sem chave de release configurada: pulando (use o APK debug)."
           fi
@@ -63,12 +69,15 @@ jobs:
         run: |
           mkdir -p dist
           cp android/app/build/outputs/apk/debug/app-debug.apk dist/ABYSSAL-Android-debug.apk
+
           if [ -f android/app/build/outputs/apk/release/app-release.apk ]; then
             cp android/app/build/outputs/apk/release/app-release.apk dist/ABYSSAL-Android.apk
           fi
-          ls -la dist
+
+          ls -lh dist
 
       - uses: actions/upload-artifact@v4
         with:
           name: ABYSSAL-APK
           path: dist/*.apk
+          if-no-files-found: error
