@@ -1,0 +1,55 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Os arquivos do jogo ficam em ../www (fonte unica). Sao copiados para os assets do app a cada build.
+def webAssetsDir = layout.buildDirectory.dir('generated/webassets')
+tasks.register('copyWebAssets', Copy) {
+    from("${rootDir}/../www")
+    into(webAssetsDir.map { it.dir('www') })
+}
+
+android {
+    namespace 'com.abyssal.game'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.abyssal.game'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    sourceSets {
+        main.assets.srcDirs += webAssetsDir
+    }
+
+    // Assinatura de release: somente se as variaveis de ambiente existirem (nunca ha chaves no repositorio).
+    def ksPath = System.getenv('ABYSSAL_KEYSTORE')
+    if (ksPath) {
+        signingConfigs {
+            release {
+                storeFile file(ksPath)
+                storePassword System.getenv('ABYSSAL_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ABYSSAL_KEY_ALIAS')
+                keyPassword System.getenv('ABYSSAL_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (ksPath) signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    lint { abortOnError false }
+}
+
+tasks.matching { it.name ==~ /merge.*Assets/ }.configureEach { dependsOn 'copyWebAssets' }

@@ -1,0 +1,80 @@
+{
+ "sub": {
+  "w": 32,
+  "h": 22,
+  "cols": 4,
+  "rows": 3
+ },
+ "crystal_s": {
+  "w": 12,
+  "h": 16,
+  "cols": 4,
+  "rows": 1
+ },
+ "crystal_m": {
+  "w": 20,
+  "h": 18,
+  "cols": 4,
+  "rows": 1
+ },
+ "crystal_l": {
+  "w": 26,
+  "h": 30,
+  "cols": 4,
+  "rows": 1
+ },
+ "patroller": {
+  "w": 30,
+  "h": 20,
+  "cols": 4,
+  "rows": 1
+ },
+ "hunter": {
+  "w": 24,
+  "h": 30,
+  "cols": 4,
+  "rows": 1
+ },
+ "kelp_tall": {
+  "w": 16,
+  "h": 52,
+  "cols": 2,
+  "rows": 1
+ },
+ "kelp_short": {
+  "w": 16,
+  "h": 30,
+  "cols": 2,
+  "rows": 1
+ },
+ "coral": {
+  "w": 22,
+  "h": 18,
+  "cols": 2,
+  "rows": 1
+ },
+ "station": {
+  "w": 184,
+  "h": 108,
+  "cols": 2,
+  "rows": 1
+ },
+ "icons": {
+  "w": 12,
+  "h": 12,
+  "cols": 9,
+  "rows": 1
+ },
+ "rock": {
+  "w": 64,
+  "h": 64,
+  "cols": 1,
+  "rows": 1
+ },
+ "metal": {
+  "w": 64,
+  "h": 64,
+  "cols": 1,
+  "rows": 1
+ }
+}

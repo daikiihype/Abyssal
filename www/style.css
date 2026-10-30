@@ -1,0 +1,6 @@
+html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: #04101f; overflow: hidden; }
+body { display: flex; align-items: center; justify-content: center; position: fixed; inset: 0;
+  touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+#game { image-rendering: pixelated; image-rendering: crisp-edges; display: block; touch-action: none; background: #04101f; }
+#fatal { position: fixed; inset: 0; background: #04101f; color: #ff8a7a; font: 14px monospace; padding: 16px; white-space: pre-wrap; }
